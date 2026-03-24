@@ -29,6 +29,8 @@ A polished and accessible frontend capable of accepting both text and voice inpu
 
 ---
 
+
+
 ## Milestone 2: AI Integration & Smart History Management
 
 ### Description
