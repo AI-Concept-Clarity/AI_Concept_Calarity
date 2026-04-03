@@ -1,5 +1,6 @@
 flask
 groq
+gunicorn
 transformers
-torch
 sentencepiece
+torch --index-url https://download.pytorch.org/whl/cpu

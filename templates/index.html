@@ -6,41 +6,58 @@
   <title>ConceptClarity · Scientific Learning Assistant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-
-  <!-- DARK MODE TOGGLE -->
-  <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode" aria-label="Toggle theme">
-    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-    </svg>
-    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/>
-      <line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/>
-      <line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  <!-- ANIMATED BIOLUMINESCENT BACKGROUND -->
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+  <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <svg class="icon-sun"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1"  x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1"  y1="12" x2="3"  y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
     </svg>
   </button>
 
   <div class="app-layout">
 
-    <!-- ═══════════════════════ LEFT SIDEBAR ═══════════════════════ -->
-    <aside class="sidebar">
+    <!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+    <aside class="sidebar" id="sidebar">
 
       <div class="sidebar-brand">
-        <span class="brand-icon">🔬</span>
+        <div class="brand-icon-wrap">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="18" r="18" fill="url(#bg)"/>
+            <path d="M10 24 L18 10 L26 24" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <circle cx="18" cy="10" r="2.5" fill="white"/>
+            <line x1="13" y1="20" x2="23" y2="20" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <defs><linearGradient id="bg" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#6366f1"/><stop offset="1" stop-color="#06b6d4"/>
+            </linearGradient></defs>
+          </svg>
+        </div>
         <div>
           <h1 class="brand-name">ConceptClarity</h1>
           <p class="brand-tagline">Scientific Learning Assistant</p>
         </div>
       </div>
 
+      <!-- NEW SEARCH BUTTON -->
+      <button class="new-search-btn" onclick="clearSearch()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Search
+      </button>
+
       <!-- HISTORY -->
       <div class="sidebar-section">
-        <p class="sidebar-section-title">Search History</p>
+        <p class="sidebar-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Search History
+        </p>
         <ul class="history-list" id="historyList">
           {% if history %}
             {% for group, items in history.items() %}
@@ -48,9 +65,7 @@
                 <li class="history-group">{{ group }}</li>
                 {% for item in items %}
                   <li class="history-item" data-id="{{ item.id }}">
-                    <span class="history-term" onclick="runHistory('{{ item.term }}')">
-                      {{ item.term }}
-                    </span>
+                    <span class="history-term" onclick="runHistory('{{ item.term|replace("'","&#39;") }}')">{{ item.term }}</span>
                     <div class="menu-wrapper">
                       <button class="menu-btn" aria-label="Options">⋯</button>
                       <div class="menu-dropdown">
@@ -63,47 +78,71 @@
               {% endif %}
             {% endfor %}
           {% else %}
-            <li class="history-empty">No searches yet</li>
+            <li class="history-empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              No searches yet
+            </li>
           {% endif %}
         </ul>
       </div>
 
       <!-- TRENDING -->
       <div class="sidebar-section trending-section">
-        <p class="sidebar-section-title">🔥 Trending Concepts</p>
+        <p class="sidebar-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Trending Concepts
+        </p>
         <ul class="trending-list">
           {% for concept in trending %}
-            <li class="trending-item" onclick="runHistory('{{ concept }}')">{{ concept }}</li>
+            <li class="trending-item" onclick="runHistory('{{ concept }}')">
+              <span class="trending-dot"></span>{{ concept }}
+            </li>
           {% endfor %}
         </ul>
       </div>
 
       <div class="sidebar-footer">
-        <span>ConceptClarity v2.0</span>
-        <span>Powered by Groq</span>
+        <div class="footer-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          ConceptClarity v2.1
+        </div>
+        <div class="footer-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          Powered by Groq
+        </div>
       </div>
     </aside>
 
-    <!-- ═══════════════════════ MAIN CONTENT ═══════════════════════ -->
+    <!-- ═══════════════════ MAIN ═══════════════════ -->
     <main class="main-content">
 
       <!-- HEADER -->
       <header class="content-header">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
         <div class="header-left">
           <h2 class="page-title">Explore Science</h2>
           <p class="page-subtitle">Ask anything. Understand everything.</p>
         </div>
+        <div class="header-stats" id="headerStats" style="display:none">
+          <span class="stat-chip" id="statTerm"></span>
+        </div>
       </header>
 
       <!-- SEARCH CARD -->
-      <section class="search-card">
+      <section class="search-card" id="searchCard">
 
-        <!-- ROW 1: DIFFICULTY + LANGUAGE (same horizontal row) -->
-        <div class="controls-row">
+        <!-- CONTROLS ROW -->
+        <div class="controls-row" id="controlsRow">
 
-          <!-- DIFFICULTY -->
+          <!-- RE-GENERATE HINT shown after first result -->
+          <div class="regen-hint" id="regenHint" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Changing level or language will <strong>auto re-generate</strong> the explanation
+          </div>
           <div class="control-group">
-            <span class="control-label">Level</span>
+            <span class="control-label">Difficulty Level</span>
             <div class="difficulty-tabs" role="radiogroup" aria-label="Learning difficulty">
               <button class="diff-tab" data-level="beginner" role="radio" aria-checked="false">🌱 Beginner</button>
               <button class="diff-tab active" data-level="intermediate" role="radio" aria-checked="true">⚗️ Intermediate</button>
@@ -111,47 +150,34 @@
             </div>
           </div>
 
-          <!-- LANGUAGE SELECTOR -->
+          <!-- LANGUAGE -->
           <div class="control-group">
             <span class="control-label">Language</span>
             <div class="lang-selector" id="langSelector">
               <button class="lang-trigger" id="langTrigger" aria-haspopup="listbox" aria-expanded="false">
                 <span class="lang-flag" id="langFlag">🇬🇧</span>
                 <span class="lang-name" id="langName">English</span>
-                <svg class="lang-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <polyline points="6 9 12 15 18 9"/>
-                </svg>
+                <svg class="lang-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
-
               <ul class="lang-dropdown" id="langDropdown" role="listbox" aria-label="Select language">
-                <li class="lang-option active" data-lang="English" data-flag="🇬🇧" data-code="en" role="option" aria-selected="true">
-                  <span class="lang-opt-flag">🇬🇧</span>
-                  <span class="lang-opt-name">English</span>
-                  <span class="lang-opt-native">English</span>
+                <li class="lang-option active" data-lang="English" data-flag="🇬🇧" role="option" aria-selected="true">
+                  <span class="lang-opt-flag">🇬🇧</span><span class="lang-opt-name">English</span><span class="lang-opt-native">English</span>
                   <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 </li>
-                <li class="lang-option" data-lang="Hindi" data-flag="🇮🇳" data-code="hi" role="option" aria-selected="false">
-                  <span class="lang-opt-flag">🇮🇳</span>
-                  <span class="lang-opt-name">Hindi</span>
-                  <span class="lang-opt-native">हिन्दी</span>
+                <li class="lang-option" data-lang="Hindi" data-flag="🇮🇳" role="option" aria-selected="false">
+                  <span class="lang-opt-flag">🇮🇳</span><span class="lang-opt-name">Hindi</span><span class="lang-opt-native">हिन्दी</span>
                   <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 </li>
-                <li class="lang-option" data-lang="Telugu" data-flag="🇮🇳" data-code="te" role="option" aria-selected="false">
-                  <span class="lang-opt-flag">🇮🇳</span>
-                  <span class="lang-opt-name">Telugu</span>
-                  <span class="lang-opt-native">తెలుగు</span>
+                <li class="lang-option" data-lang="Telugu" data-flag="🇮🇳" role="option" aria-selected="false">
+                  <span class="lang-opt-flag">🇮🇳</span><span class="lang-opt-name">Telugu</span><span class="lang-opt-native">తెలుగు</span>
                   <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 </li>
-                <li class="lang-option" data-lang="French" data-flag="🇫🇷" data-code="fr" role="option" aria-selected="false">
-                  <span class="lang-opt-flag">🇫🇷</span>
-                  <span class="lang-opt-name">French</span>
-                  <span class="lang-opt-native">Français</span>
+                <li class="lang-option" data-lang="French" data-flag="🇫🇷" role="option" aria-selected="false">
+                  <span class="lang-opt-flag">🇫🇷</span><span class="lang-opt-name">French</span><span class="lang-opt-native">Français</span>
                   <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 </li>
-                <li class="lang-option" data-lang="German" data-flag="🇩🇪" data-code="de" role="option" aria-selected="false">
-                  <span class="lang-opt-flag">🇩🇪</span>
-                  <span class="lang-opt-name">German</span>
-                  <span class="lang-opt-native">Deutsch</span>
+                <li class="lang-option" data-lang="German" data-flag="🇩🇪" role="option" aria-selected="false">
+                  <span class="lang-opt-flag">🇩🇪</span><span class="lang-opt-name">German</span><span class="lang-opt-native">Deutsch</span>
                   <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 </li>
               </ul>
@@ -161,64 +187,76 @@
         </div><!-- end controls-row -->
 
         <!-- INPUT ROW -->
-        <form id="qaForm" onsubmit="return false;" autocomplete="off">
-          <div class="input-row">
-            <div class="input-shell">
-              <svg class="input-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        <div class="input-row">
+          <div class="input-shell">
+            <svg class="input-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input
+              type="text"
+              id="questionInput"
+              class="question-input"
+              placeholder="e.g. How does quantum entanglement work?"
+              autocomplete="off"
+              spellcheck="false"
+              aria-label="Enter a scientific term or question"
+              maxlength="200"
+            >
+            <div class="autocomplete-dropdown" id="autocompleteDropdown" role="listbox"></div>
+            <button type="button" class="mic-btn" id="micButton" aria-label="Voice input" title="Voice input">
+              <svg class="mic-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 14 0h-2zM11 18h2v3h-2z"/>
               </svg>
-              <input
-                type="text"
-                id="questionInput"
-                class="question-input"
-                placeholder="e.g. How does quantum entanglement work?"
-                autocomplete="off"
-                spellcheck="false"
-              >
-              <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
-              <button type="button" class="mic-btn" id="micButton" aria-label="Voice input">
-                <svg class="mic-icon" viewBox="0 0 24 24">
-                  <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 14 0h-2zM11 18h2v3h-2z"/>
-                </svg>
-                <svg class="wave-icon" viewBox="0 0 24 24">
-                  <rect x="4" y="8" width="3" height="8" rx="1.5"/>
-                  <rect x="10" y="5" width="3" height="14" rx="1.5"/>
-                  <rect x="16" y="8" width="3" height="8" rx="1.5"/>
-                </svg>
-              </button>
-            </div>
-            <button type="submit" class="explain-btn" id="explainBtn">
-              <span class="btn-text">Explain</span>
-              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+              <svg class="wave-icon" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="3"  y="8"  width="3" height="8" rx="1.5"/>
+                <rect x="10" y="4"  width="3" height="16" rx="1.5"/>
+                <rect x="17" y="8"  width="3" height="8" rx="1.5"/>
               </svg>
             </button>
+            <button type="button" class="clear-input-btn" id="clearInputBtn" aria-label="Clear input" title="Clear" style="display:none">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
           </div>
-        </form>
+          <button type="button" class="explain-btn" id="explainBtn" onclick="explainConcept(document.getElementById('questionInput').value.trim())">
+            <span class="btn-text">Explain</span>
+            <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- CHAR COUNT -->
+        <div class="char-counter" id="charCounter" style="display:none">
+          <span id="charCount">0</span>/200
+        </div>
+
+        <!-- VALIDATION MESSAGE -->
+        <div class="validation-msg" id="validationMsg" role="alert" aria-live="polite"></div>
 
         <!-- QUICK PICKS -->
         <div class="quick-picks">
           <span class="quick-picks-label">Quick picks</span>
           <div class="chip-row">
-            <button class="chip">DNA</button>
-            <button class="chip">Black Hole</button>
-            <button class="chip">Mitosis</button>
-            <button class="chip">Gravity</button>
-            <button class="chip">Photosynthesis</button>
-            <button class="chip">Entropy</button>
+            <button class="chip" type="button">DNA</button>
+            <button class="chip" type="button">Black Hole</button>
+            <button class="chip" type="button">Mitosis</button>
+            <button class="chip" type="button">Gravity</button>
+            <button class="chip" type="button">Photosynthesis</button>
+            <button class="chip" type="button">Entropy</button>
+            <button class="chip" type="button">CRISPR</button>
+            <button class="chip" type="button">Neurons</button>
           </div>
         </div>
 
-      </section>
+      </section><!-- end search-card -->
 
       <!-- RESPONSE AREA -->
-      <section id="responseArea" class="response-area" aria-live="polite"></section>
+      <section id="responseArea" class="response-area" aria-live="polite" aria-atomic="false"></section>
 
     </main>
   </div>
 
+<!-- ═══════════════════ SCRIPT ═══════════════════ -->
 <script>
-(function() {
+(function () {
 "use strict";
 
 /* ─── STATE ─── */
@@ -227,23 +265,33 @@ let currentDifficulty  = "intermediate";
 let currentLanguage    = "English";
 let currentExplanation = "";
 let feedbackGiven      = false;
+let isLoading          = false;
 
 /* ─── DOM REFS ─── */
-const qaForm        = document.getElementById("qaForm");
-const input         = document.getElementById("questionInput");
-const responseArea  = document.getElementById("responseArea");
-const diffTabs      = document.querySelectorAll(".diff-tab");
-const chips         = document.querySelectorAll(".chip");
-const micButton     = document.getElementById("micButton");
-const themeToggle   = document.getElementById("themeToggle");
-const autoDropdown  = document.getElementById("autocompleteDropdown");
-const langTrigger   = document.getElementById("langTrigger");
-const langDropdown  = document.getElementById("langDropdown");
-const langFlag      = document.getElementById("langFlag");
-const langName      = document.getElementById("langName");
-const historyList   = document.getElementById("historyList");
+const input          = document.getElementById("questionInput");
+const responseArea   = document.getElementById("responseArea");
+const diffTabs       = document.querySelectorAll(".diff-tab");
+const chips          = document.querySelectorAll(".chip");
+const micButton      = document.getElementById("micButton");
+const themeToggle    = document.getElementById("themeToggle");
+const autoDropdown   = document.getElementById("autocompleteDropdown");
+const langTrigger    = document.getElementById("langTrigger");
+const langDropdown   = document.getElementById("langDropdown");
+const langFlag       = document.getElementById("langFlag");
+const langName       = document.getElementById("langName");
+const historyList    = document.getElementById("historyList");
+const validationMsg  = document.getElementById("validationMsg");
+const charCounter    = document.getElementById("charCounter");
+const charCount      = document.getElementById("charCount");
+const clearBtn       = document.getElementById("clearInputBtn");
+const explainBtn     = document.getElementById("explainBtn");
+const sidebarToggle  = document.getElementById("sidebarToggle");
+const sidebar        = document.getElementById("sidebar");
+const headerStats    = document.getElementById("headerStats");
+const statTerm       = document.getElementById("statTerm");
+const regenHint      = document.getElementById("regenHint");
 
-/* ─── AUTOCOMPLETE TERMS ─── */
+/* ─── SCIENCE TERMS (autocomplete) ─── */
 const SCIENCE_TERMS = [
   "Photosynthesis","Mitosis","Meiosis","DNA","RNA","CRISPR","Osmosis","Entropy",
   "Quantum Mechanics","Black Hole","Dark Matter","Dark Energy","Relativity",
@@ -253,10 +301,20 @@ const SCIENCE_TERMS = [
   "Radioactivity","Half-life","String Theory","Quarks","Higgs Boson","Antibiotic",
   "Virus","Bacteria","Evolution","Natural Selection","Ecosystem","Metabolism",
   "Thermodynamics","Kinetic Energy","Potential Energy","Wave Function","Superconductor",
-  "Magnetism","Electric Field","Bernoulli's Principle","Doppler Effect","Diffraction"
+  "Magnetism","Electric Field","Bernoulli Principle","Doppler Effect","Diffraction",
+  "Mitochondria","Ribosome","Cell Membrane","Nucleus","Cytoplasm","Chlorophyll",
+  "Tectonic Plates","Earthquake","Tsunami","Volcano","Erosion","Atmosphere",
+  "Greenhouse Effect","Carbon Cycle","Water Cycle","Food Chain","Biodiversity",
+  "Vaccine","Antibody","Immune System","Allele","Genotype","Phenotype",
+  "Stem Cell","Clone","Gene Expression","Protein Synthesis","ATP","Glycolysis",
+  "Thermodynamics","Entropy","Enthalpy","Gibbs Free Energy","Activation Energy",
+  "Quantum Entanglement","Superposition","Uncertainty Principle","Photoelectric Effect",
+  "Electromagnetic Spectrum","Infrared","Ultraviolet","X-ray","Gamma Ray",
+  "Centripetal Force","Torque","Angular Momentum","Conservation of Energy",
+  "Osmotic Pressure","Tonicity","Diffusion","Active Transport","Endocytosis"
 ];
 
-/* ─── THEME ─── */
+/* ═════════════════════ THEME ═════════════════════ */
 const savedTheme = localStorage.getItem("cc-theme") || "dark";
 document.documentElement.setAttribute("data-theme", savedTheme);
 themeToggle.addEventListener("click", () => {
@@ -265,205 +323,520 @@ themeToggle.addEventListener("click", () => {
   localStorage.setItem("cc-theme", next);
 });
 
-/* ─── LANGUAGE SELECTOR ─── */
-langTrigger.addEventListener("click", (e) => {
+/* ═════════════════════ SIDEBAR TOGGLE (mobile) ═════════════════════ */
+sidebarToggle.addEventListener("click", () => {
+  sidebar.classList.toggle("open");
+});
+document.addEventListener("click", e => {
+  if (sidebar.classList.contains("open") && !sidebar.contains(e.target) && e.target !== sidebarToggle) {
+    sidebar.classList.remove("open");
+  }
+});
+
+/* ═════════════════════ LANGUAGE SELECTOR ═════════════════════ */
+langTrigger.addEventListener("click", e => {
   e.stopPropagation();
   const open = langDropdown.classList.toggle("open");
   langTrigger.setAttribute("aria-expanded", open);
 });
-
 document.querySelectorAll(".lang-option").forEach(opt => {
   opt.addEventListener("click", () => {
-    // Update state
+    const prev = currentLanguage;
     currentLanguage = opt.dataset.lang;
-    // Update trigger display
     langFlag.textContent = opt.dataset.flag;
     langName.textContent = opt.dataset.lang;
-    // Update active class
     document.querySelectorAll(".lang-option").forEach(o => {
-      o.classList.remove("active");
-      o.setAttribute("aria-selected", "false");
+      o.classList.remove("active"); o.setAttribute("aria-selected","false");
     });
-    opt.classList.add("active");
-    opt.setAttribute("aria-selected", "true");
-    // Close dropdown
+    opt.classList.add("active"); opt.setAttribute("aria-selected","true");
     langDropdown.classList.remove("open");
-    langTrigger.setAttribute("aria-expanded", "false");
-    // Update placeholder based on language
+    langTrigger.setAttribute("aria-expanded","false");
     updatePlaceholder(currentLanguage);
+    // Re-fetch if language changed and there is a result on screen
+    if (prev !== currentLanguage && currentTerm && document.getElementById("resultCard")) {
+      reExplainCurrent();
+    }
   });
 });
-
-function updatePlaceholder(lang) {
-  const placeholders = {
-    English: "e.g. How does quantum entanglement work?",
-    Hindi:   "जैसे: प्रकाश संश्लेषण कैसे काम करता है?",
-    Telugu:  "ఉదా: కిరణజన్య సంయోగక్రియ ఎలా పని చేస్తుంది?",
-    French:  "ex. Comment fonctionne la photosynthèse?",
-    German:  "z.B. Wie funktioniert die Photosynthese?"
-  };
-  input.placeholder = placeholders[lang] || placeholders.English;
-}
-
-// Close lang dropdown on outside click
-document.addEventListener("click", (e) => {
+document.addEventListener("click", e => {
   if (!e.target.closest("#langSelector")) {
     langDropdown.classList.remove("open");
-    langTrigger.setAttribute("aria-expanded", "false");
+    langTrigger.setAttribute("aria-expanded","false");
   }
 });
 
-/* ─── DIFFICULTY TABS ─── */
+function updatePlaceholder(lang) {
+  const p = {
+    English:"e.g. How does quantum entanglement work?",
+    Hindi:"जैसे: प्रकाश संश्लेषण क्या है?",
+    Telugu:"ఉదా: కిరణజన్య సంయోగక్రియ అంటే ఏమిటి?",
+    French:"ex. Comment fonctionne la photosynthèse?",
+    German:"z.B. Wie funktioniert die Photosynthese?"
+  };
+  input.placeholder = p[lang] || p.English;
+}
+
+/* ═════════════════════ DIFFICULTY TABS ═════════════════════ */
 diffTabs.forEach(tab => {
   tab.addEventListener("click", () => {
+    const prev = currentDifficulty;
     diffTabs.forEach(t => { t.classList.remove("active"); t.setAttribute("aria-checked","false"); });
-    tab.classList.add("active");
-    tab.setAttribute("aria-checked","true");
+    tab.classList.add("active"); tab.setAttribute("aria-checked","true");
     currentDifficulty = tab.dataset.level;
+    // Re-fetch if difficulty changed and there is a result on screen
+    if (prev !== currentDifficulty && currentTerm && document.getElementById("resultCard")) {
+      reExplainCurrent();
+    }
   });
 });
 
-/* ─── CHIPS ─── */
+/* ═════════════════════ CHIPS ═════════════════════ */
 chips.forEach(chip => {
   chip.addEventListener("click", () => {
     input.value = chip.textContent.trim();
-    input.focus();
+    updateCharCounter();
+    clearValidation();
+    autoDropdown.style.display = "none";
     chip.classList.add("chip-pulse");
-    setTimeout(() => chip.classList.remove("chip-pulse"), 300);
+    // Highlight the selected chip
+    chips.forEach(c => c.classList.remove("chip-active"));
+    chip.classList.add("chip-active");
+    setTimeout(() => chip.classList.remove("chip-pulse"), 400);
+    // Only fill the input — user must click Explain to submit
+    input.focus();
   });
 });
 
-/* ─── AUTOCOMPLETE ─── */
-input.addEventListener("input", () => {
-  const q = input.value.trim().toLowerCase();
-  if (q.length < 2) { autoDropdown.style.display = "none"; return; }
-  const matches = SCIENCE_TERMS.filter(t => t.toLowerCase().includes(q)).slice(0, 6);
-  if (!matches.length) { autoDropdown.style.display = "none"; return; }
-  autoDropdown.innerHTML = matches.map(m =>
-    `<div class="auto-item" data-val="${m}">${highlightMatch(m, q)}</div>`
-  ).join("");
-  autoDropdown.style.display = "block";
-});
-function highlightMatch(term, query) {
-  const idx = term.toLowerCase().indexOf(query);
-  if (idx === -1) return term;
-  return term.slice(0, idx) + `<strong>${term.slice(idx, idx+query.length)}</strong>` + term.slice(idx+query.length);
+/* ═════════════════════ INPUT UTILITIES ═════════════════════ */
+function updateCharCounter() {
+  const len = input.value.length;
+  charCount.textContent = len;
+  charCounter.style.display = len > 0 ? "flex" : "none";
+  clearBtn.style.display = len > 0 ? "flex" : "none";
+  if (len > 180) charCounter.classList.add("warn");
+  else charCounter.classList.remove("warn");
 }
-autoDropdown.addEventListener("click", e => {
-  const item = e.target.closest(".auto-item");
-  if (item) { input.value = item.dataset.val; autoDropdown.style.display = "none"; input.focus(); }
-});
-document.addEventListener("click", e => {
-  if (!e.target.closest(".input-shell")) autoDropdown.style.display = "none";
+
+clearBtn.addEventListener("click", () => {
+  input.value = "";
+  clearBtn.style.display = "none";
+  charCounter.style.display = "none";
+  clearValidation();
+  input.focus();
+  autoDropdown.style.display = "none";
+  chips.forEach(c => c.classList.remove("chip-active"));
 });
 
-/* ─── VOICE INPUT ─── */
+// Single merged input listener: counter + validation clear + autocomplete + chip highlight
+input.addEventListener("input", () => {
+  updateCharCounter();
+  clearValidation();
+  handleAutocomplete();
+  // Sync chip-active state
+  const val = input.value.trim().toLowerCase();
+  chips.forEach(c => {
+    if (val && c.textContent.trim().toLowerCase() === val) c.classList.add("chip-active");
+    else c.classList.remove("chip-active");
+  });
+});
+
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const term = input.value.trim();
+    if (term) explainConcept(term);
+  }
+});
+
+function setValidation(msg, type = "error") {
+  validationMsg.textContent = msg;
+  validationMsg.className = `validation-msg ${type}`;
+  validationMsg.style.display = "flex";
+}
+function clearValidation() {
+  validationMsg.style.display = "none";
+  validationMsg.textContent = "";
+}
+
+function clearSearch() {
+  input.value = "";
+  clearBtn.style.display = "none";
+  charCounter.style.display = "none";
+  clearValidation();
+  responseArea.innerHTML = "";
+  currentTerm = "";
+  headerStats.style.display = "none";
+  if (regenHint) regenHint.style.display = "none";
+  chips.forEach(c => c.classList.remove("chip-active"));
+  input.focus();
+}
+window.clearSearch = clearSearch;
+
+/* ═════════════════════ AUTOCOMPLETE ═════════════════════ */
+let acIndex = -1;
+function handleAutocomplete() {
+  const q = input.value.trim().toLowerCase();
+  if (q.length < 2) { autoDropdown.style.display = "none"; acIndex = -1; return; }
+  const matches = SCIENCE_TERMS.filter(t => t.toLowerCase().includes(q)).slice(0, 7);
+  if (!matches.length) { autoDropdown.style.display = "none"; return; }
+  autoDropdown.innerHTML = matches.map((m, i) =>
+    `<div class="auto-item" role="option" data-val="${escapeHtml(m)}" data-idx="${i}">${highlightMatch(escapeHtml(m), q)}</div>`
+  ).join("");
+  autoDropdown.style.display = "block";
+  acIndex = -1;
+}
+
+function highlightMatch(term, query) {
+  const lower = term.toLowerCase();
+  const idx   = lower.indexOf(query.toLowerCase());
+  if (idx === -1) return term;
+  return term.slice(0, idx)
+    + `<mark>${term.slice(idx, idx + query.length)}</mark>`
+    + term.slice(idx + query.length);
+}
+
+autoDropdown.addEventListener("mousedown", e => {
+  const item = e.target.closest(".auto-item");
+  if (!item) return;
+  e.preventDefault();
+  input.value = item.dataset.val;
+  autoDropdown.style.display = "none";
+  acIndex = -1;
+  updateCharCounter();
+  input.focus();
+});
+
+input.addEventListener("keydown", e => {
+  const items = autoDropdown.querySelectorAll(".auto-item");
+  if (!items.length || autoDropdown.style.display === "none") return;
+  if (e.key === "ArrowDown") {
+    e.preventDefault(); acIndex = Math.min(acIndex + 1, items.length - 1);
+    items.forEach((it, i) => it.classList.toggle("active", i === acIndex));
+  }
+  if (e.key === "ArrowUp") {
+    e.preventDefault(); acIndex = Math.max(acIndex - 1, 0);
+    items.forEach((it, i) => it.classList.toggle("active", i === acIndex));
+  }
+  if (e.key === "Escape") { autoDropdown.style.display = "none"; acIndex = -1; }
+  if (e.key === "Tab" && acIndex >= 0) {
+    e.preventDefault(); input.value = items[acIndex].dataset.val;
+    autoDropdown.style.display = "none"; updateCharCounter();
+  }
+});
+
+document.addEventListener("click", e => {
+  if (!e.target.closest(".input-shell")) { autoDropdown.style.display = "none"; acIndex = -1; }
+});
+
+/* ═════════════════════ VOICE INPUT ═════════════════════ */
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 if (!SpeechRecognition) {
   micButton.style.display = "none";
 } else {
   const langCodes = { English:"en-US", Hindi:"hi-IN", Telugu:"te-IN", French:"fr-FR", German:"de-DE" };
   const recognition = new SpeechRecognition();
+  recognition.continuous    = false;
   recognition.interimResults = false;
+  let isRecording = false;
+
   micButton.addEventListener("click", () => {
+    if (isRecording) { recognition.stop(); return; }
     recognition.lang = langCodes[currentLanguage] || "en-US";
-    recognition.start();
+    try { recognition.start(); } catch(e) {}
+    isRecording = true;
     micButton.classList.add("recording");
   });
-  recognition.onresult = e => { input.value = e.results[0][0].transcript; };
-  recognition.onend = () => { micButton.classList.remove("recording"); input.focus(); };
-  recognition.onerror = () => micButton.classList.remove("recording");
+
+  recognition.onresult = e => {
+    const transcript = e.results[0][0].transcript.trim();
+    input.value = transcript;
+    updateCharCounter();
+    clearValidation();
+  };
+
+  recognition.onend = () => {
+    isRecording = false;
+    micButton.classList.remove("recording");
+    if (input.value.trim()) input.focus();
+  };
+
+  recognition.onerror = e => {
+    isRecording = false;
+    micButton.classList.remove("recording");
+    if (e.error !== "no-speech") setValidation("Voice input error. Please try again.", "error");
+  };
 }
 
-/* ─── MAIN EXPLAIN ─── */
+/* ═════════════════════ CLIENT-SIDE VALIDATION ═════════════════════ */
+function validateTerm(term) {
+  if (!term) return "Please enter a scientific term.";
+  if (/^\d+$/.test(term)) return "Numbers only are not valid. Please enter a scientific concept.";
+  if (!/[A-Za-zÀ-ÿ\u0900-\u097F\u0C00-\u0C7F]/.test(term)) return "Please enter letters — not just symbols.";
+  if (term.length > 200) return "Term too long. Please be more specific.";
+  return null;
+}
+
+/* ═════════════════════ MAIN EXPLAIN ═════════════════════ */
 async function explainConcept(term) {
-  if (!term.trim()) return;
-  currentTerm = term;
+  autoDropdown.style.display = "none";
+
+  const validErr = validateTerm(term);
+  if (validErr) { setValidation(validErr, "error"); return; }
+  if (isLoading) return;
+
+  clearValidation();
+  isLoading     = true;
+  currentTerm   = term;
   feedbackGiven = false;
-  responseArea.innerHTML = renderLoading();
+
+  // Show loading state on button
+  explainBtn.disabled = true;
+  explainBtn.classList.add("loading");
+
+  responseArea.innerHTML = renderLoading(term);
+  responseArea.scrollIntoView({ behavior: "smooth", block: "start" });
 
   try {
-    const res = await fetch("/api/explain", {
-      method: "POST",
+    const res  = await fetch("/api/explain", {
+      method:  "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ term, difficulty: currentDifficulty, language: currentLanguage })
+      body:    JSON.stringify({ term, difficulty: currentDifficulty, language: currentLanguage }),
     });
+
     const data = await res.json();
-    if (data.status !== "success") throw new Error(data.message || "Unknown error");
+
+    if (!res.ok || data.status !== "success") {
+      throw new Error(data.message || `Server error (${res.status})`);
+    }
 
     currentExplanation = data.explanation;
     responseArea.innerHTML = renderResult(data);
     attachResultEvents();
     if (data.history) renderHistory(data.history);
+
+    // Update header stat
+    statTerm.textContent = data.term;
+    headerStats.style.display = "flex";
+    // Show the re-generate hint
+    if (regenHint) regenHint.style.display = "flex";
+
+    // Animate in
+    const card = document.getElementById("resultCard");
+    if (card) { card.style.opacity = 0; requestAnimationFrame(() => { card.style.transition = "opacity .4s"; card.style.opacity = 1; }); }
+
   } catch (err) {
-    responseArea.innerHTML = renderError(err.message);
+    responseArea.innerHTML = renderError(err.message || "Something went wrong. Please try again.");
+  } finally {
+    isLoading = false;
+    explainBtn.disabled = false;
+    explainBtn.classList.remove("loading");
   }
 }
+window.explainConcept = explainConcept;
 
-/* ─── FOLLOW-UP ─── */
-async function sendFollowup() {
-  const fInput = document.getElementById("followupInput");
-  const question = fInput.value.trim();
-  if (!question || !currentTerm) return;
-  const thread = document.getElementById("followupThread");
-  thread.innerHTML += renderFollowupMsg(question, "user");
-  fInput.value = "";
-  thread.innerHTML += `<div class="followup-msg assistant" id="fThinking">
-    <span class="followup-avatar">AI</span>
-    <p><span class="thinking-dot"></span><span class="thinking-dot"></span><span class="thinking-dot"></span></p>
-  </div>`;
-  thread.scrollTop = thread.scrollHeight;
+/* ═════════════════════ RE-EXPLAIN (lang/level switch) ═════════════════════ */
+// Called when language or difficulty changes while a result is visible.
+// Shows a subtle inline re-loading banner instead of wiping the full card.
+async function reExplainCurrent() {
+  if (!currentTerm || isLoading) return;
+  isLoading = true;
+  feedbackGiven = false;
+
+  // Show a non-disruptive re-loading overlay on the existing card
+  const card = document.getElementById("resultCard");
+  if (card) {
+    card.style.opacity = "0.45";
+    card.style.pointerEvents = "none";
+    // Insert a small banner at the top
+    if (!document.getElementById("reloadBanner")) {
+      const banner = document.createElement("div");
+      banner.id = "reloadBanner";
+      banner.className = "reload-banner";
+      banner.innerHTML = `<div class="reload-spinner"></div><span>Translating to <strong>${escapeHtml(currentLanguage)}</strong> at <strong>${escapeHtml(currentDifficulty)}</strong> level…</span>`;
+      card.prepend(banner);
+    }
+  }
+
   try {
-    const res = await fetch("/api/followup", {
-      method: "POST",
+    const res = await fetch("/api/explain", {
+      method:  "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ term: currentTerm, question, difficulty: currentDifficulty, language: currentLanguage, context: currentExplanation })
+      body:    JSON.stringify({ term: currentTerm, difficulty: currentDifficulty, language: currentLanguage }),
     });
     const data = await res.json();
-    document.getElementById("fThinking")?.remove();
-    thread.innerHTML += renderFollowupMsg(data.status === "success" ? data.answer : "Sorry, couldn't answer that.", "assistant");
+    if (!res.ok || data.status !== "success") throw new Error(data.message || `Server error (${res.status})`);
+
+    currentExplanation = data.explanation;
+    responseArea.innerHTML = renderResult(data);
+    attachResultEvents();
+    if (data.history) renderHistory(data.history);
+    statTerm.textContent = data.term;
+    headerStats.style.display = "flex";
+    if (regenHint) regenHint.style.display = "flex";
+    const newCard = document.getElementById("resultCard");
+    if (newCard) {
+      newCard.style.opacity = 0;
+      requestAnimationFrame(() => { newCard.style.transition = "opacity .35s"; newCard.style.opacity = 1; });
+    }
+  } catch (err) {
+    // Restore card and show a toast error — don't wipe the existing result
+    const card2 = document.getElementById("resultCard");
+    if (card2) { card2.style.opacity = "1"; card2.style.pointerEvents = ""; }
+    document.getElementById("reloadBanner")?.remove();
+    showToast(err.message || "Could not retranslate. Please try again.", "error");
+  } finally {
+    isLoading = false;
+  }
+}
+
+/* ═════════════════════ TOAST NOTIFICATION ═════════════════════ */
+function showToast(msg, type = "info") {
+  let toastWrap = document.getElementById("toastWrap");
+  if (!toastWrap) {
+    toastWrap = document.createElement("div");
+    toastWrap.id = "toastWrap";
+    toastWrap.style.cssText = "position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;";
+    document.body.appendChild(toastWrap);
+  }
+  const toast = document.createElement("div");
+  toast.className = `toast toast-${type}`;
+  toast.textContent = msg;
+  toastWrap.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add("toast-show"));
+  setTimeout(() => {
+    toast.classList.remove("toast-show");
+    setTimeout(() => toast.remove(), 350);
+  }, 3500);
+}
+
+/* ═════════════════════ FOLLOW-UP ═════════════════════ */
+async function sendFollowup() {
+  const fInput   = document.getElementById("followupInput");
+  const sendBtn  = document.getElementById("followupSendBtn");
+  if (!fInput) return;
+  const question = fInput.value.trim();
+  if (!question || !currentTerm) return;
+
+  const thread = document.getElementById("followupThread");
+  thread.insertAdjacentHTML("beforeend", renderFollowupMsg(question, "user"));
+  fInput.value = "";
+  if (sendBtn) sendBtn.disabled = true;
+
+  const thinkingId = "fThinking_" + Date.now();
+  thread.insertAdjacentHTML("beforeend", `
+    <div class="followup-msg assistant" id="${thinkingId}">
+      <span class="followup-avatar">AI</span>
+      <p class="thinking-dots"><span></span><span></span><span></span></p>
+    </div>`);
+  thread.scrollTop = thread.scrollHeight;
+
+  try {
+    const res  = await fetch("/api/followup", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ term: currentTerm, question, difficulty: currentDifficulty, language: currentLanguage, context: currentExplanation }),
+    });
+    const data = await res.json();
+    document.getElementById(thinkingId)?.remove();
+    const answer = (data.status === "success" && data.answer) ? data.answer : "Sorry, I couldn't answer that. Please try rephrasing.";
+    thread.insertAdjacentHTML("beforeend", renderFollowupMsg(answer, "assistant"));
   } catch {
-    document.getElementById("fThinking")?.remove();
-    thread.innerHTML += renderFollowupMsg("Network error. Please try again.", "assistant");
+    document.getElementById(thinkingId)?.remove();
+    thread.insertAdjacentHTML("beforeend", renderFollowupMsg("Network error. Please try again.", "assistant"));
+  } finally {
+    if (sendBtn) sendBtn.disabled = false;
   }
   thread.scrollTop = thread.scrollHeight;
 }
+window.sendFollowup = sendFollowup;
 
-/* ─── FEEDBACK ─── */
+/* ═════════════════════ FEEDBACK ═════════════════════ */
 async function sendFeedback(rating) {
   if (feedbackGiven) return;
   feedbackGiven = true;
   document.querySelectorAll(".feedback-btn").forEach(b => b.disabled = true);
   document.querySelector(`.feedback-btn[data-rating="${rating}"]`)?.classList.add("feedback-selected");
   document.getElementById("feedbackThanks")?.classList.remove("hidden");
-  try { await fetch("/api/feedback", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({term:currentTerm, rating}) }); } catch {}
+  try {
+    await fetch("/api/feedback", {
+      method:  "POST",
+      headers: { "Content-Type":"application/json" },
+      body:    JSON.stringify({ term: currentTerm, rating }),
+    });
+  } catch {}
 }
+window.sendFeedback = sendFeedback;
 
-/* ─── COPY ─── */
+/* ═════════════════════ COPY ═════════════════════ */
 function copyExplanation() {
-  if (!currentExplanation) return;
-  navigator.clipboard.writeText(currentExplanation).then(() => {
+  const card = document.getElementById("resultCard");
+  if (!card || !currentExplanation) return;
+
+  // Build full text from all visible blocks
+  const blocks = card.querySelectorAll(".result-block p");
+  const fullText = Array.from(blocks).map(p => p.textContent.trim()).filter(Boolean).join("\n\n");
+  const copyText = (fullText || currentExplanation) + `\n\n— ConceptClarity · ${currentTerm}`;
+
+  navigator.clipboard.writeText(copyText).then(() => {
     const btn = document.getElementById("copyBtn");
     if (!btn) return;
-    btn.textContent = "✓ Copied!";
+    const orig = btn.innerHTML;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
     btn.classList.add("copied");
-    setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
+    setTimeout(() => { btn.innerHTML = orig; btn.classList.remove("copied"); }, 2000);
+  }).catch(() => {
+    // Fallback for browsers that block clipboard
+    const ta = document.createElement("textarea");
+    ta.value = fullText || currentExplanation;
+    document.body.appendChild(ta); ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
   });
 }
+window.copyExplanation = copyExplanation;
 
-/* ─── RENDER ─── */
-function renderLoading() {
-  return `<div class="loading-card"><div class="loading-spinner"></div><p class="loading-text">Generating explanation…</p></div>`;
+/* ═════════════════════ RENDER HELPERS ═════════════════════ */
+function renderLoading(term) {
+  const steps = ["Analysing concept…", "Crafting explanation…", "Almost there…"];
+  return `
+    <div class="loading-card">
+      <div class="loading-orb">
+        <div class="orb-ring"></div>
+        <div class="orb-ring r2"></div>
+        <div class="orb-ring r3"></div>
+        <svg class="orb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </div>
+      <p class="loading-term">${escapeHtml(term)}</p>
+      <p class="loading-text" id="loadingText">${steps[0]}</p>
+      <div class="loading-steps">
+        ${steps.map((s, i) => `<span class="loading-step ${i===0?'active':''}">${s}</span>`).join("")}
+      </div>
+    </div>`;
 }
+
 function renderError(msg) {
-  return `<div class="result-card error-card"><div class="error-icon">⚠️</div><p class="error-msg">${escapeHtml(msg||"Something went wrong.")}</p></div>`;
+  return `
+    <div class="result-card error-card">
+      <div class="error-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <h3 class="error-title">Couldn't generate explanation</h3>
+      <p class="error-msg">${escapeHtml(msg || "Something went wrong. Please try again.")}</p>
+      <button class="retry-btn" onclick="explainConcept('${escapeHtml(currentTerm)}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Try Again
+      </button>
+    </div>`;
 }
 
 function renderResult(data) {
-  const langBadge = currentLanguage !== "English"
-    ? `<span class="lang-badge">${getLangFlag(currentLanguage)} ${currentLanguage}</span>` : "";
+  const tag = data.tag || {};
+  const tagHtml = `<span class="difficulty-tag tag-${data.difficulty}">${tag.emoji || ""} ${tag.label || data.difficulty}</span>`;
 
-  const tagHtml = `<span class="difficulty-tag tag-${data.difficulty}">${data.tag.emoji} ${data.tag.label}</span>`;
+  const langBadge = (data.language && data.language !== "English")
+    ? `<span class="lang-badge">${getLangFlag(data.language)} ${escapeHtml(data.language)}</span>` : "";
 
   const exampleHtml = data.example ? `
     <div class="result-block example-block">
@@ -483,11 +856,14 @@ function renderResult(data) {
       <p>${escapeHtml(data.key_insight)}</p>
     </div>` : "";
 
-  const relatedHtml = data.related_terms?.length ? `
+  const relatedHtml = (data.related_terms && data.related_terms.length) ? `
     <div class="related-section">
-      <p class="related-label">Related Concepts</p>
+      <p class="related-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Related Concepts
+      </p>
       <div class="related-chips">
-        ${data.related_terms.map(t => `<button class="related-chip" onclick="runHistory('${escapeHtml(t)}')">${escapeHtml(t)}</button>`).join("")}
+        ${data.related_terms.map(t => `<button class="related-chip" type="button" onclick="explainConcept('${escapeHtml(t)}')">${escapeHtml(t)}</button>`).join("")}
       </div>
     </div>` : "";
 
@@ -496,13 +872,16 @@ function renderResult(data) {
       <div class="result-header">
         <div class="result-title-row">
           <h3 class="result-term">${escapeHtml(data.term)}</h3>
-          ${tagHtml}
-          ${langBadge}
+          <div class="result-badges">${tagHtml}${langBadge}</div>
         </div>
         <div class="result-actions">
-          <button class="action-icon-btn" id="copyBtn" onclick="copyExplanation()">Copy</button>
+          <button class="action-icon-btn" id="copyBtn" onclick="copyExplanation()" aria-label="Copy explanation" title="Copy">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
         </div>
       </div>
+
       <div class="result-block explanation-block">
         <div class="block-label">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -510,21 +889,32 @@ function renderResult(data) {
         </div>
         <p>${escapeHtml(data.explanation)}</p>
       </div>
+
       ${exampleHtml}${insightHtml}${relatedHtml}
+
+      <!-- FEEDBACK -->
       <div class="feedback-row">
         <span class="feedback-prompt">Was this helpful?</span>
         <div class="feedback-btns">
-          <button class="feedback-btn" data-rating="helpful" onclick="sendFeedback('helpful')">👍 Yes</button>
-          <button class="feedback-btn" data-rating="unhelpful" onclick="sendFeedback('unhelpful')">👎 No</button>
+          <button class="feedback-btn" type="button" data-rating="helpful"   onclick="sendFeedback('helpful')">👍 Yes</button>
+          <button class="feedback-btn" type="button" data-rating="unhelpful" onclick="sendFeedback('unhelpful')">👎 No</button>
         </div>
-        <span class="feedback-thanks hidden" id="feedbackThanks">Thanks!</span>
+        <span class="feedback-thanks hidden" id="feedbackThanks">Thanks for your feedback!</span>
       </div>
+
+      <!-- FOLLOW-UP -->
       <div class="followup-section">
-        <p class="followup-label">💬 Ask a follow-up question</p>
-        <div class="followup-thread" id="followupThread"></div>
+        <p class="followup-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Ask a follow-up question
+        </p>
+        <div class="followup-thread" id="followupThread" role="log" aria-live="polite"></div>
         <div class="followup-input-row">
-          <input type="text" id="followupInput" class="followup-input" placeholder="e.g. How is this used in medicine?">
-          <button class="followup-send-btn" onclick="sendFollowup()">
+          <input type="text" id="followupInput" class="followup-input"
+            placeholder="e.g. How is this used in medicine?"
+            aria-label="Follow-up question"
+            maxlength="300">
+          <button class="followup-send-btn" id="followupSendBtn" type="button" onclick="sendFollowup()" aria-label="Send follow-up">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </div>
@@ -533,37 +923,55 @@ function renderResult(data) {
 }
 
 function renderFollowupMsg(text, role) {
-  return `<div class="followup-msg ${role}"><span class="followup-avatar">${role==="user"?"You":"AI"}</span><p>${escapeHtml(text)}</p></div>`;
+  const isAI = role === "assistant";
+  return `
+    <div class="followup-msg ${role}">
+      <span class="followup-avatar ${isAI ? "ai-avatar" : ""}">${isAI ? "AI" : "You"}</span>
+      <p>${escapeHtml(text)}</p>
+    </div>`;
 }
 
 function getLangFlag(lang) {
-  const flags = { English:"🇬🇧", Hindi:"🇮🇳", Telugu:"🇮🇳", French:"🇫🇷", German:"🇩🇪" };
-  return flags[lang] || "🌐";
+  return { English:"🇬🇧", Hindi:"🇮🇳", Telugu:"🇮🇳", French:"🇫🇷", German:"🇩🇪" }[lang] || "🌐";
 }
 
 function attachResultEvents() {
   const fInput = document.getElementById("followupInput");
-  if (fInput) fInput.addEventListener("keydown", e => { if (e.key === "Enter") sendFollowup(); });
+  if (fInput) {
+    fInput.addEventListener("keydown", e => { if (e.key === "Enter") sendFollowup(); });
+  }
+  // Animate blocks
+  document.querySelectorAll(".result-block").forEach((block, i) => {
+    block.style.opacity    = 0;
+    block.style.transform  = "translateY(12px)";
+    block.style.transition = `opacity .35s ${i * 0.1}s, transform .35s ${i * 0.1}s`;
+    requestAnimationFrame(() => { block.style.opacity = 1; block.style.transform = "translateY(0)"; });
+  });
 }
 
-/* ─── HISTORY ─── */
+/* ═════════════════════ HISTORY ═════════════════════ */
 function renderHistory(grouped) {
   historyList.innerHTML = "";
+  const hasAny = Object.values(grouped).some(g => g.length > 0);
+  if (!hasAny) {
+    historyList.innerHTML = `<li class="history-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>No searches yet</li>`;
+    return;
+  }
   Object.keys(grouped).forEach(group => {
     if (!grouped[group].length) return;
-    historyList.innerHTML += `<li class="history-group">${group}</li>`;
+    historyList.insertAdjacentHTML("beforeend", `<li class="history-group">${group}</li>`);
     grouped[group].forEach(item => {
-      historyList.innerHTML += `
-        <li class="history-item" data-id="${item.id}">
-          <span class="history-term" onclick="runHistory('${escapeHtml(item.term)}')">${escapeHtml(item.term)}</span>
+      historyList.insertAdjacentHTML("beforeend", `
+        <li class="history-item" data-id="${escapeHtml(item.id)}">
+          <span class="history-term" onclick="runHistory('${escapeHtml(item.term).replace(/'/g,"&#39;")}')">${escapeHtml(item.term)}</span>
           <div class="menu-wrapper">
-            <button class="menu-btn">⋯</button>
+            <button class="menu-btn" aria-label="Options" type="button">⋯</button>
             <div class="menu-dropdown">
-              <button onclick="renameItem('${item.id}')">✏️ Rename</button>
-              <button class="danger" onclick="deleteItem('${item.id}')">🗑 Delete</button>
+              <button type="button" onclick="renameItem('${escapeHtml(item.id)}')">✏️ Rename</button>
+              <button type="button" class="danger" onclick="deleteItem('${escapeHtml(item.id)}')">🗑 Delete</button>
             </div>
           </div>
-        </li>`;
+        </li>`);
     });
   });
   attachMenuEvents();
@@ -571,76 +979,216 @@ function renderHistory(grouped) {
 
 function attachMenuEvents() {
   document.querySelectorAll(".menu-btn").forEach(btn => {
-    btn.addEventListener("click", e => {
+    btn.onclick = e => {
       e.stopPropagation();
       const menu = btn.nextElementSibling;
-      document.querySelectorAll(".menu-dropdown").forEach(m => m.style.display = "none");
-      menu.style.display = "block";
-    });
+      const isOpen = menu.classList.contains("visible");
+      document.querySelectorAll(".menu-dropdown").forEach(m => m.classList.remove("visible"));
+      if (!isOpen) menu.classList.add("visible");
+    };
   });
 }
 document.addEventListener("click", () => {
-  document.querySelectorAll(".menu-dropdown").forEach(m => m.style.display = "none");
+  document.querySelectorAll(".menu-dropdown").forEach(m => m.classList.remove("visible"));
 });
 attachMenuEvents();
 
 function deleteItem(id) {
-  fetch(`/delete/${id}`, { method: "DELETE" }).then(() => document.querySelector(`li[data-id='${id}']`)?.remove());
+  fetch(`/delete/${id}`, { method: "DELETE" }).then(r => {
+    if (r.ok) document.querySelector(`li[data-id='${id}']`)?.remove();
+  }).catch(() => {});
 }
+
 function renameItem(id) {
   const li = document.querySelector(`li[data-id='${id}']`);
   if (!li) return;
   const span = li.querySelector(".history-term");
-  const inp = document.createElement("input");
-  inp.value = span.textContent.trim();
+  const inp  = document.createElement("input");
+  inp.value     = span.textContent.trim();
   inp.className = "rename-input";
-  span.replaceWith(inp); inp.focus(); inp.select();
-  li.querySelector(".menu-dropdown").style.display = "none";
-  inp.addEventListener("keydown", e => { if (e.key==="Enter") saveRename(id,inp,li); if (e.key==="Escape") inp.replaceWith(span); });
-  inp.addEventListener("blur", () => saveRename(id,inp,li));
+  inp.maxLength = 100;
+  span.replaceWith(inp);
+  inp.focus(); inp.select();
+  li.querySelector(".menu-dropdown")?.classList.remove("visible");
+
+  const save = () => saveRename(id, inp, li);
+  inp.addEventListener("keydown", e => {
+    if (e.key === "Enter")  save();
+    if (e.key === "Escape") inp.replaceWith(span);
+  });
+  inp.addEventListener("blur", save);
 }
+
 function saveRename(id, inp, li) {
   const newName = inp.value.trim();
-  if (!newName) return;
-  fetch(`/rename/${id}`, { method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body:`new_name=${encodeURIComponent(newName)}` }).then(() => {
-    const span = document.createElement("span");
-    span.className = "history-term"; span.textContent = newName;
-    span.onclick = () => runHistory(newName);
-    inp.replaceWith(span);
-  });
+  if (!newName) { inp.replaceWith(li.querySelector(".history-term") || inp); return; }
+  fetch(`/rename/${id}`, {
+    method:  "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body:    `new_name=${encodeURIComponent(newName)}`,
+  }).then(r => {
+    if (r.ok) {
+      const span    = document.createElement("span");
+      span.className = "history-term";
+      span.textContent = newName;
+      span.onclick   = () => runHistory(newName);
+      inp.replaceWith(span);
+    }
+  }).catch(() => inp.replaceWith(inp));   // restore on error
 }
 
-function runHistory(term) { input.value = term; explainConcept(term); }
-
-qaForm.addEventListener("submit", e => { e.preventDefault(); explainConcept(input.value.trim()); });
-
-function escapeHtml(str) {
-  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+function runHistory(term) {
+  input.value = term;
+  updateCharCounter();
+  clearValidation();
+  explainConcept(term);
 }
+window.runHistory  = runHistory;
+window.deleteItem  = deleteItem;
+window.renameItem  = renameItem;
 
-/* ─── KEYBOARD HISTORY NAV ─── */
+/* ═════════════════════ KEYBOARD HISTORY NAV ═════════════════════ */
 let histIndex = -1;
 document.addEventListener("keydown", e => {
   if (document.activeElement !== input) return;
   const items = [...document.querySelectorAll(".history-term")];
   if (!items.length) return;
-  if (e.key==="ArrowDown") { e.preventDefault(); histIndex=Math.min(histIndex+1,items.length-1); highlightHistory(items); }
-  if (e.key==="ArrowUp")   { e.preventDefault(); histIndex=Math.max(histIndex-1,0); highlightHistory(items); }
-  if (e.key==="Enter" && histIndex>=0) { e.preventDefault(); items[histIndex].click(); histIndex=-1; }
+  if (e.key === "ArrowDown") { e.preventDefault(); histIndex = Math.min(histIndex + 1, items.length - 1); highlightHistory(items); }
+  if (e.key === "ArrowUp")   { e.preventDefault(); histIndex = Math.max(histIndex - 1, 0); highlightHistory(items); }
+  if (e.key === "Enter" && histIndex >= 0 && autoDropdown.style.display === "none") {
+    e.preventDefault(); items[histIndex].click(); histIndex = -1;
+  }
 });
 function highlightHistory(items) {
-  items.forEach(i => i.classList.remove("active-history"));
-  items[histIndex]?.classList.add("active-history");
+  items.forEach((it, i) => it.classList.toggle("active-history", i === histIndex));
+  items[histIndex]?.scrollIntoView({ block: "nearest" });
 }
 
-/* expose globals */
-window.runHistory = runHistory;
-window.deleteItem = deleteItem;
-window.renameItem = renameItem;
-window.copyExplanation = copyExplanation;
-window.sendFeedback = sendFeedback;
-window.sendFollowup = sendFollowup;
+/* ═════════════════════ UTILITIES ═════════════════════ */
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
 
+/* ═════════════════════ LOADING STEPPER ═════════════════════ */
+(function() {
+  const steps = ["Analysing concept…", "Crafting explanation…", "Almost there…"];
+  let ti = null;
+  const observer = new MutationObserver(() => {
+    const lt = document.getElementById("loadingText");
+    if (lt) {
+      let idx = 1;
+      clearInterval(ti);
+      ti = setInterval(() => {
+        if (!document.getElementById("loadingText")) { clearInterval(ti); return; }
+        document.getElementById("loadingText").textContent = steps[idx % steps.length];
+        document.querySelectorAll(".loading-step").forEach((s, i) => s.classList.toggle("active", i === idx % steps.length));
+        idx++;
+      }, 1200);
+    } else {
+      clearInterval(ti);
+    }
+  });
+  observer.observe(responseArea, { childList: true, subtree: true });
+})();
+
+})();
+</script>
+
+<!-- ═══════════════ BIOLUMINESCENT CANVAS BACKGROUND ═══════════════ -->
+<script>
+(function() {
+  const canvas = document.getElementById("bgCanvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  let W, H, animId;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener("resize", () => { resize(); });
+
+  const COLOURS = [
+    "rgba(0,245,196,",
+    "rgba(0,212,255,",
+    "rgba(57,255,170,",
+    "rgba(100,220,255,",
+    "rgba(0,180,200,",
+  ];
+
+  function rnd(a, b) { return Math.random() * (b - a) + a; }
+
+  const COUNT = window.innerWidth < 768 ? 38 : 80;
+  const particles = Array.from({length: COUNT}, () => ({
+    x: rnd(0, window.innerWidth), y: rnd(0, window.innerHeight),
+    r: rnd(1.2, 4.2),
+    vx: rnd(-0.15, 0.15), vy: rnd(-0.25, -0.05),
+    alpha: rnd(0.1, 0.5),
+    dalpha: rnd(-0.002, 0.002),
+    col: COLOURS[Math.floor(Math.random() * COLOURS.length)],
+    pulse: rnd(0, Math.PI * 2),
+    pulseSpeed: rnd(0.008, 0.022),
+  }));
+
+  const BLOBS = Array.from({length: 5}, (_, i) => ({
+    x: window.innerWidth  * rnd(0.05, 0.95),
+    y: window.innerHeight * rnd(0.05, 0.95),
+    r: rnd(100, 280),
+    vx: rnd(-0.05, 0.05), vy: rnd(-0.04, 0.04),
+    alpha: rnd(0.02, 0.05),
+    col: COLOURS[i % COLOURS.length],
+    phase: rnd(0, Math.PI * 2),
+  }));
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    BLOBS.forEach(b => {
+      b.x += b.vx; b.y += b.vy; b.phase += 0.004;
+      if (b.x < -b.r) b.x = W + b.r;
+      if (b.x > W + b.r) b.x = -b.r;
+      if (b.y < -b.r) b.y = H + b.r;
+      if (b.y > H + b.r) b.y = -b.r;
+      const a = b.alpha + Math.sin(b.phase) * 0.012;
+      const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+      g.addColorStop(0,   b.col + Math.min(a, 0.07)  + ")");
+      g.addColorStop(0.5, b.col + Math.min(a, 0.035) + ")");
+      g.addColorStop(1,   b.col + "0)");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill();
+    });
+
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.pulse += p.pulseSpeed;
+      p.alpha += p.dalpha;
+      if (p.alpha <= 0.05 || p.alpha >= 0.55) p.dalpha *= -1;
+      if (p.y < -10) { p.y = H + 10; p.x = rnd(0, W); }
+      if (p.x < -10) p.x = W + 10;
+      if (p.x > W + 10) p.x = -10;
+
+      const pr = p.r + Math.sin(p.pulse) * 0.7;
+      const g2 = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, pr * 3.2);
+      g2.addColorStop(0,   p.col + Math.min(p.alpha * 1.5, 0.85) + ")");
+      g2.addColorStop(0.4, p.col + Math.min(p.alpha * 0.7, 0.4)  + ")");
+      g2.addColorStop(1,   p.col + "0)");
+      ctx.fillStyle = g2;
+      ctx.beginPath(); ctx.arc(p.x, p.y, pr * 3.2, 0, Math.PI * 2); ctx.fill();
+
+      ctx.fillStyle = p.col + Math.min(p.alpha * 2.5, 1) + ")";
+      ctx.beginPath(); ctx.arc(p.x, p.y, pr * 0.55, 0, Math.PI * 2); ctx.fill();
+    });
+
+    animId = requestAnimationFrame(draw);
+  }
+
+  draw();
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) cancelAnimationFrame(animId);
+    else draw();
+  });
 })();
 </script>
 </body>
